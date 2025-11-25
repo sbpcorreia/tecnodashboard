@@ -17,6 +17,6 @@
 
 
         @livewireScripts
-        @fluxScripts
+        <script src="{{ asset('flux/flux.min.js') }}"></script>
     </body>
 </html>

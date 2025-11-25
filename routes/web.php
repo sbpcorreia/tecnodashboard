@@ -8,8 +8,8 @@ use App\Livewire\WorkCenter;
 use Livewire\Livewire;
 
 Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/tecnodashboard/public/livewire/update', $handle)->name('custom');
-        });
+    return Route::post('/tecnodashboard/public/livewire/update', $handle)->name('custom');
+});
 
 Route::get('/', WorkCenter::class);
 
