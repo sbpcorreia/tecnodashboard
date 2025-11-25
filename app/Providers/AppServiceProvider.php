@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
             });
 
             Livewire::setUpdateRoute(function($handle) {
-                return Route::post('/tecnodashboard/livewire/update', $handle)->name('custom-update');
+                return Route::post('/tecnodashboard/public/livewire/update', $handle)->name('custom-update');
             });
 
             // Forçar URL base
