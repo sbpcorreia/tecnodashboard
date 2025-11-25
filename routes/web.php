@@ -7,10 +7,6 @@ use Livewire\Volt\Volt;
 use App\Livewire\WorkCenter;
 use Livewire\Livewire;
 
-Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/tecnodashboard/livewire/update', $handle)->name('custom');
-        });
-
 Route::get('/', WorkCenter::class);
 
 
