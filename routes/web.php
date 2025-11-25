@@ -5,9 +5,16 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Livewire\WorkCenter;
+use Livewire\Livewire;
 
 Route::get('/', WorkCenter::class);
 
+$livewireUpdateRoute = env('LIVEWIRE_UPDATE_ROUTE');
+
+// Set the Livewire update route dynamically
+Livewire::setUpdateRoute(function ($handle) use ($livewireUpdateRoute) {
+return Route::post($livewireUpdateRoute, $handle);
+});
 //Route::get('/test', [Test::class, "showAll"]);
 
 /*Route::get('/', function () {
