@@ -50,9 +50,39 @@
                                     <p class="font-bold text-yellow-950">{{ $workCenter->motivo }}</p>
                                 </div>
 
-                                <div class="mt-2 text-xs text-yellow-800 flex items-center gap-1">
+                                <div x-data="{
+                                startTime: {{ $workCenter->stopped_at }},
+                                elapsed: '',
+
+                                calculateTime() {
+                                    const now = Date.now();
+                                    const diff = now - this.startTime; // Diferença em milissegundos
+
+                                    // Garante que o tempo decorrido não é negativo
+                                    if (diff < 0) {
+                                        this.elapsed = '0s';
+                                        return;
+                                    }
+
+                                    // Conversão de milissegundos para H:M:S
+                                    const totalSeconds = Math.floor(diff / 1000);
+                                    const hours = Math.floor(totalSeconds / 3600);
+                                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+                                    const seconds = totalSeconds % 60;
+
+                                    // Formatação da string de resultado
+                                    let result = '';
+                                    if (hours > 0) {
+                                        result += `${hours}h `;
+                                    }
+                                    result += `${minutes}m ${seconds}s`;
+
+                                    this.elapsed = result.trim();
+                                }
+                            }"
+                            x-init="calculateTime(); setInterval(() => calculateTime(), 1000)" class="mt-2 text-xs text-yellow-800 flex items-center gap-1">
                                     <flux:icon.clock class="w-3 h-3" />
-                                    <span>Desde: {{ $workCenter->datahora }}</span>
+                                    <span>Parado desde <span x-text="elapsed"></span></span>
                                 </div>
                             </div>
                         @endforeach

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\TouchLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Events\RemoveCard;
 
 class CheckWorkCentersStatus extends Command
 {
@@ -88,6 +89,17 @@ class CheckWorkCentersStatus extends Command
             }
         }
 
+        // 4. Disparar o Evento para cada ID único encontrado
+        $uniqueIds = $extractedOperationIds->unique();
+
+        foreach($uniqueIds as $id) {
+            // Importar a classe do evento no topo: use App\Events\RemoveCard;
+            event(new RemoveCard($id));
+
+            Log::info("⚡ Evento RemoveCard disparado para ID: $id");
+        }
+
+        return Command::SUCCESS;
 
 
     }

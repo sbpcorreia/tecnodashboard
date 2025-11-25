@@ -8,6 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Arr;
+use Carbon\Carbon;
 
 #[Title("Centros de trabalho - Tecnolanema")]
 class WorkCenter extends BaseComponent
@@ -99,9 +100,19 @@ class WorkCenter extends BaseComponent
             return $item->rn == 1 && !in_array($item->u_tabofopstamp, $this->removeIds);
         });
 
-        // Retornamos os resultados.
-        // Dica: Se forem muitos registos, considere ->paginate(50) em vez de ->get()
-        //return $query->get();
+        $interruptedOperations = $interruptedOperations->map(function ($operation) {
+            $format = 'Y-m-d H:i:s.000';
+
+            try {
+                $stoppedAtCarbon = Carbon::createFromFormat($format, $operation->datahora);
+                $operation->stopped_at = $stoppedAtCarbon->timestamp * 1000;
+
+            } catch (\Throwable $th) {
+                $operation->stopped_at = 0;
+            }
+            return $operation;
+        });
+
         return $interruptedOperations;
     }
 

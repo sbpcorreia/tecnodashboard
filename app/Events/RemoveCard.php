@@ -10,18 +10,18 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateWorkCenter
+class RemoveCard implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $workCenter;
+    public $operationId;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($workCenter)
+    public function __construct($operationId)
     {
-        $this->workCenter = $workCenter;
+        $this->operationId = $operationId;
     }
 
     /**
@@ -32,7 +32,11 @@ class UpdateWorkCenter
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('workCenter'),
+            new Channel('workCenterStatus'),
         ];
+    }
+
+    public function broadcastAs() {
+        return 'RemoveCard';
     }
 }
