@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
+        <base href="{{ asset('/') }}">
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -17,6 +18,7 @@
 
 
         @livewireScripts
-        <script src="{{ asset('flux/flux.min.js') }}"></script>
-    </body>
+
+        @fluxScripts
+        </body>
 </html>
