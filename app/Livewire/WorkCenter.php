@@ -17,9 +17,11 @@ class WorkCenter extends BaseComponent
     public $selectedInterruptReasons = "";
     public $filteredData = false;
     public $messages = [];
+    public $removeIds = [];
 
     protected $listeners = [
-        "echo:workCenter,UpdateWorkCenter" => "refreshWorkCenters"
+        "echo:workCenter,UpdateWorkCenter" => "refreshWorkCenters",
+        "echo:workCenterStatus,RemoveCard" => "removeCard"
     ];
 
     #[On('filters-applied')]
@@ -93,7 +95,8 @@ class WorkCenter extends BaseComponent
         $results = $query->get();
 
         $interruptedOperations = $results->filter(function($item) {
-            return $item->rn == 1;
+            // Mantém se for rn=1 E se o ID NÃO estiver na lista de removidos
+            return $item->rn == 1 && !in_array($item->u_tabofopstamp, $this->removeIds);
         });
 
         // Retornamos os resultados.
@@ -114,6 +117,17 @@ class WorkCenter extends BaseComponent
         // Limpa a cache da computed property para forçar re-consulta na base de dados
         unset($this->interruptedWorkCenters);
         // O Livewire encarrega-se de renderizar novamente
+    }
+
+    public function removeCard(array $eventData) {
+        $operationId = $eventData['u_tabofopstamp'] ?? null;
+
+        if(!$operationId) {
+            return;
+        }
+
+
+        $this->removeIds[] = $operationId;
     }
 
     public function render()
