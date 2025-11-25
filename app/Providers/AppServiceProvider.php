@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
+use Illuminate\Routing\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if(!config('app.debug')) {
+            Livewire::setUpdateRoute(function ($handle) {
+                return Route::post('/tecnodashboard/livewire/update', $handle);
+            });
+            Livewire::setScriptRoute(function ($handle) {
+                return Route::get('/tecnodashboard/livewire/livewire.js', $handle);
+            });
+        }
     }
 }
