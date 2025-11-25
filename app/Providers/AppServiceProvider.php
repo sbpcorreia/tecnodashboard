@@ -23,32 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-        URL::forceRootUrl(config('app.url'));
-
-        // Se estiver atrás de proxy
-        if (request()->server->has('HTTP_X_FORWARDED_HOST')) {
-            URL::forceScheme('https');
-        }
-
-        if(!config('app.debug')) {
-
-
-
-            // Forçar URL base
-            //URL::forceRootUrl(config('app.url'));
-            //
-            //// IMPORTANTE: Configurar o Livewire para usar o endpoint correto
-            //Livewire::setUpdateRoute(function ($handle) {
-            //    return \Illuminate\Support\Facades\Route::post('/tecnodashboard/livewire/update', $handle)
-            //        ->middleware('web')
-            //        ->name('livewire.update');
-            //});
         //
-            //Livewire::setScriptRoute(function ($handle) {
-            //    return \Illuminate\Support\Facades\Route::get('/tecnodashboard/livewire/livewire.min.js', $handle)
-            //        ->name('livewire.javascript');
-            //});
-        }
     }
 }
