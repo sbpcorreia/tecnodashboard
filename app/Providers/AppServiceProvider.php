@@ -32,15 +32,13 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if(!config('app.debug')) {
+            // Forçar URL base
+            URL::forceRootUrl(config('app.url'));
 
-
-
-            /*Livewire::setUpdateRoute(function ($handle) {
-                return Route::post('/tecnodashboard/livewire/update', $handle);
+            // Forçar endpoint do Livewire
+            Livewire::setUpdateRoute(function ($handle) {
+                return Route::post('/livewire/update', $handle);
             });
-            Livewire::setScriptRoute(function ($handle) {
-                return Route::get('/tecnodashboard/livewire/livewire.js', $handle);
-            });*/
         }
     }
 }
