@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
 
             // Forçar endpoint do Livewire
             Livewire::setUpdateRoute(function ($handle) {
-                return Route::post('/livewire/update', $handle);
+                return Route::post('/tecnodashboard/livewire/update', $handle);
             });
         }
     }
