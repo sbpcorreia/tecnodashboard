@@ -138,11 +138,12 @@ class SetOperator extends Component
             ->get()
             ->first();
 
-        $logTouch = TouchLog::findOrFail($this->logTouchStamp);
-        //$logTouch->timestamps = false;
-        $logTouch->pestamp = $employee->pestamp;
-        $logTouch->usrdata = date('Y-m-d');
-        $updated = $logTouch->save();
+        $updated = DB::table('u_logtouch')
+            ->where('u_logtouchstamp', $this->logTouchStamp)
+            ->update([
+                'pestamp' => $this->operator,
+                'usrdata' => date('Y-m-d')
+            ]);
 
         if(!$updated) {
             Flux::toast("Ocorreu um erro ao atualizar o registo de produção!", "Erro", 2000, "error");
