@@ -20,6 +20,8 @@ class TouchLog extends Model
 
     public $timestamps = false;
 
+    const UPDATED_AT = null;
+    const CREATED_AT = null;
 
     protected $fillable = [
         'datareg',
