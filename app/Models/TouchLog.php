@@ -18,7 +18,10 @@ class TouchLog extends Model
 
     protected $keyType = 'string';
 
-    public $timestamps = false;
+    public $timestamps = true;
+
+    const UPDATED_AT = 'usrdata';
+    const CREATED_AT = 'ousrdata';
 
 
 
