@@ -18,6 +18,8 @@ class TouchLog extends Model
 
     protected $keyType = 'string';
 
+    public $timestamps = false;
+
 
     protected $fillable = [
         'datareg',
