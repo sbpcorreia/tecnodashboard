@@ -86,8 +86,6 @@ class SetOperator extends Component
         $this->operationDescription = $record->descop;
         $this->workOrderStamp = $record->u_tabofstamp;
         $this->workCenterStamp = $record->u_tabctstamp;
-        $this->terminal = $record->posto;
-        $this->terminal = $record->posto;
         $this->resp = $record->responsavel;
         $this->bistamp = $record->bistamp;
         $this->lot = $record->lote;
@@ -143,7 +141,7 @@ class SetOperator extends Component
         $logTouch = TouchLog::findOrFail($this->logTouchStamp);
         $logTouch->timestamps = false;
         $logTouch->pestamp = $employee->pestamp;
-        $logTouch->save();
+        $updated = $logTouch->save();
 
         if(!$updated) {
             Flux::toast("Ocorreu um erro ao atualizar o registo de produção!", "Erro", 2000, "error");
