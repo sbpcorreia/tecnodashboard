@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\TouchLog;
+use Flux\Flux;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
@@ -14,8 +15,8 @@ use Carbon\Carbon;
 class WorkCenter extends BaseComponent
 {
 
-    public $selectedWorkCenters = "";
-    public $selectedInterruptReasons = "";
+    public $selectedWorkCenters = [];
+    public $selectedInterruptReasons = [];
     public $filteredData = false;
     public $messages = [];
     public $removeIds = [];
@@ -27,20 +28,24 @@ class WorkCenter extends BaseComponent
 
     #[On('filters-applied')]
     public function applyFilters($events) {
-        $this->selectedWorkCenters = $events["selectedWorkCenters"] ?? "";
-        $this->selectedInterruptReasons = $events["selectedInterruptReasons"] ?? "";
+        $this->selectedWorkCenters = $events["selectedWorkCenters"] ?? [];
+        $this->selectedInterruptReasons = $events["selectedInterruptReasons"] ?? [];
         $this->filteredData = true;
+
+        Flux::toast("Filtro aplicado", "Sucesso", 2000, "success");
     }
 
     public function clearFilters() {
         $this->selectedWorkCenters = [];
         $this->selectedInterruptReasons = [];
         $this->filteredData = false;
+        Flux::toast("Filtros removidos", "Aviso", 2000, "warning");
     }
 
     public function updateWorkCenter($event) {
         $id = $event['workCenter']['id'];
         $this->interruptedWorkCenters[$id] = $event['workCenter'];
+        Flux::toast("Painel actualizado", "Sucesso", "success", "top-right");
     }
 
     #[Computed]
@@ -63,6 +68,8 @@ class WorkCenter extends BaseComponent
                 DB::raw('u_tabofop.descricao AS descop'),
                 'u_tabpr.codigo AS codpr',
                 'u_tabpr.descricao AS motivo',
+                'u_tabof.ref',
+                'u_tabof.design',
                 'pe.nome',
                 // Nota: Window functions são pesadas. Certifique-se que tem índices em (datareg, horareg)
                 DB::raw('ROW_NUMBER() OVER (
@@ -82,15 +89,16 @@ class WorkCenter extends BaseComponent
             ->join("u_tabpr", "u_tabpr.u_tabprstamp", "=", "u_logtouch.tabprstamp")
             ->join("pe", "pe.pestamp", "=", "u_logtouch.pestamp")
             ->where("u_tabct.inactivo", 0)
-            ->where("u_tabct.noonline", 0);
+            ->where("u_tabct.noonline", 0)
+            ->where("u_tabpr.oculto", 0);
 
         // Aplicação dos Filtros
         if (!empty($this->selectedWorkCenters)) {
-            $query->where('u_tabct.codct', $this->selectedWorkCenters);
+            $query->whereIn('u_tabct.codct', $this->selectedWorkCenters);
         }
 
         if (!empty($this->selectedInterruptReasons)) {
-            $query->where('u_tabpr.codigo', $this->selectedInterruptReasons);
+            $query->whereIn('u_tabpr.codigo', $this->selectedInterruptReasons);
         }
 
         $results = $query->get();
@@ -118,15 +126,9 @@ class WorkCenter extends BaseComponent
 
     #[On('update-work-center')]
     public function refreshWorkCenters($params = []) {
-        if(!empty($params) && isset($params['message'])) {
-            $this->messages = [
-                "type" => $params["type"],
-                "message" => $params["message"]
-            ];
-        }
-
         // Limpa a cache da computed property para forçar re-consulta na base de dados
         unset($this->interruptedWorkCenters);
+        Flux::toast("Painel atualizado", "Info", 2000, "success", "top-right");
         // O Livewire encarrega-se de renderizar novamente
     }
 

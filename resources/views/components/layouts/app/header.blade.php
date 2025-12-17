@@ -17,8 +17,11 @@
         {{ $slot }}
 
 
-        @livewireScripts
 
-        @fluxScripts
+            @fluxScripts
+            @livewireScripts
+            <flux:toast.group position="top right">
+                <flux:toast />
+            </flux:toast.group>
         </body>
 </html>

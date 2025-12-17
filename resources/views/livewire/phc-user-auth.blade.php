@@ -13,9 +13,6 @@
                 class="text-center text-2xl tracking-widest font-mono" readonly
             />
             <flux:error name="pin" />
-            <div wire:loading wire:target="appendToPin, backspace, clear" class="absolute right-2 top-3">
-                <flux:icon.loading class="text-zinc-400 w-4 h-4 animate-spin" />
-            </div>
         </div>
 
         <div class="grid grid-cols-3 gap-1 w-full">

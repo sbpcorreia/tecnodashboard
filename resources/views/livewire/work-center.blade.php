@@ -1,4 +1,4 @@
-<div class="w-full h-full">
+<div class="w-full h-full" xmlns:flex="http://www.w3.org/1999/html">
 
 @if(empty($interruptedWorkCenters))
     <div class="text-center text-gray-500 flex justify-center place-items-center h-full text-2xl">
@@ -38,52 +38,53 @@
                                     </flux:button>
                                 </flux:tooltip>
 
-                                {{-- Note: Removi o título do workcenter daqui pois já está no cabeçalho do grupo,
-                                     mas mantive caso queira mostrar subtítulos --}}
-                                {{-- <h3 class="font-bold text-lg">{{ $workCenter->desct }}</h3> --}}
+                                <div x-data="{
+    startTime: {{ $workCenter->stopped_at }},
+    elapsed: '',
+    calculateTime() {
+        const now = Date.now();
+        const diff = now - this.startTime;
+        if (diff < 0) { this.elapsed = '00:00:00'; return; }
 
-                                <h2 class="font-bold text-md pr-8">{{ $workCenter->numof }}</h2>
-                                <p class="text-sm font-medium text-gray-800">{{$workCenter->descop}}</p>
+        const totalSeconds = Math.floor(diff / 1000);
+        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
 
+        this.elapsed = `${hours}:${minutes}:${seconds}`;
+    }
+}"
+                                     x-init="calculateTime(); setInterval(() => calculateTime(), 1000)"
+                                     class="mt-4 pt-3 border-t border-yellow-600/20 flex flex-col items-center justify-center bg-yellow-500/30 rounded-lg p-2 shadow-inner"
+                                >
+                                    <span class="text-[10px] uppercase font-bold text-yellow-900/60 leading-none mb-1">Tempo de Paragem</span>
+                                    <div class="flex items-center gap-2">
+                                        <flux:icon.clock class="w-5 h-5 text-red-700 animate-pulse" />
+                                        <span class="text-2xl font-black font-mono text-red-700 tracking-tighter" x-text="elapsed"></span>
+                                    </div>
+                                </div>
+
+                                <h1 class="font-bold text-md pr-8 text-gray-900">{{ $workCenter->numof }}</h1>
+                                <p class="text-sm font-medium text-gray-800 mb-2">{{$workCenter->descop}}</p>
+                                <p class="text-sm font-medium text-gray-800">{{$workCenter->ref}} - {{$workCenter->design}}</p>
                                 <div class="mt-3 pt-3 border-t border-yellow-500/30">
                                     <span class="text-xs uppercase tracking-wide text-yellow-900/70">Motivo</span>
                                     <p class="font-bold text-yellow-950">{{ $workCenter->motivo }}</p>
                                 </div>
+                                <div class="mt-3 pt-3 flex flex-row justify-between items-center">
+                                    <div class="flex flex-row items-center gap-2">
+                                        <span class="text-yellow-900/70"><flux:icon.user variant="micro"/></span>
+                                        <p class="text-md text-gray-800">{{$workCenter->nome}}</p>
+                                    </div>
+                                    <flux:tooltip content="Alterar utilizador" placement="top">
+                                        <flux:button variant="primary" color="orange" size="sm" square wire:click="$dispatch('open-pin-modal', { targetModal: 'set-operator', parameters: '{{ $workCenter->u_logtouchstamp }}' })">
+                                            <flux:icon.pencil variant="mini" />
+                                        </flux:button>
+                                    </flux:tooltip>
 
-                                <div x-data="{
-                                startTime: {{ $workCenter->stopped_at }},
-                                elapsed: '',
-
-                                calculateTime() {
-                                    const now = Date.now();
-                                    const diff = now - this.startTime; // Diferença em milissegundos
-
-                                    // Garante que o tempo decorrido não é negativo
-                                    if (diff < 0) {
-                                        this.elapsed = '0s';
-                                        return;
-                                    }
-
-                                    // Conversão de milissegundos para H:M:S
-                                    const totalSeconds = Math.floor(diff / 1000);
-                                    const hours = Math.floor(totalSeconds / 3600);
-                                    const minutes = Math.floor((totalSeconds % 3600) / 60);
-                                    const seconds = totalSeconds % 60;
-
-                                    // Formatação da string de resultado
-                                    let result = '';
-                                    if (hours > 0) {
-                                        result += `${hours}h `;
-                                    }
-                                    result += `${minutes}m ${seconds}s`;
-
-                                    this.elapsed = result.trim();
-                                }
-                            }"
-                            x-init="calculateTime(); setInterval(() => calculateTime(), 1000)" class="mt-2 text-xs text-yellow-800 flex items-center gap-1">
-                                    <flux:icon.clock class="w-3 h-3" />
-                                    <span>Parado desde <span x-text="elapsed"></span></span>
                                 </div>
+
+
                             </div>
                         @endforeach
 
@@ -108,8 +109,9 @@
     </div>
 
     <livewire:phc-user-auth />
-    <livewire:work-center-filter-modal>
-    <livewire:set-interrupt-reason>
+    <livewire:work-center-filter-modal />
+    <livewire:set-interrupt-reason />
+    <livewire:set-operator />
 
     @if(!empty($messages))
         @if($messages["type"] == "error")

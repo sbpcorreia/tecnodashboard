@@ -10,4 +10,10 @@ class Employees extends Model
     protected $primaryKey = 'pestamp';
     public $incrementing = false;
     protected $keyType = 'string';
+
+    public $fillable = [
+        'nome',
+        'pestamp',
+        'no'
+    ];
 }

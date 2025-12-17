@@ -1,29 +1,38 @@
-<flux:modal name="set-interrupt-reason-modal" class="w-96">
+<flux:modal name="set-interrupt-reason-modal" class="w-full max-w-md">
     <div class="flex flex-col items-center p-6 space-y-6">
         <div class="text-center">
             <flux:heading size="lg">Definir Motivo de Interrupção</flux:heading>
-
-
+        </div>
+        <div class="w-full">
+            <div class="max-w-sm rounded bg-white overflow-hidden shadow-lg">
+                <div class="px-6 py-4">
+                    <flux:subheading>Detalhes</flux:subheading>
+                    <dl class="divide-y divide-gray-100">
+                        <dt class="text-sm/6 font-medium text-gray-900">Centro de trabalho</dt>
+                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $workCenterCode }} - {{ $workCenterDescription }}</dd>
+                        <dt class="text-sm/6 font-medium text-gray-900">Ordem de fabrico / Operação</dt>
+                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $workOrderCode }} / {{ $operationDescription }}</dd>
+                        <dt class="text-sm/6 font-medium text-gray-900">Utilizador atual</dt>
+                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $user["nome"] ?? '' }}</dd>
+                    </dl>
+                </div>
+            </div>
 
         </div>
         <div class="w-full">
-            <flux:subheading>Detalhes</flux:subheading>
-            <dl class="divide-y divide-gray-100">
-                <dt class="text-sm/6 font-medium text-gray-900">Centro de trabalho</dt>
-                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $workCenterCode }} - {{ $workCenterDescription }}</dd>
-                <dt class="text-sm/6 font-medium text-gray-900">Ordem de fabrico / Operação</dt>
-                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $workOrderCode }} / {{ $operationDescription }}</dd>
-                <dt class="text-sm/6 font-medium text-gray-900">Utilizador atual</dt>
-                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $user["nome"] ?? '' }}</dd>
-            </dl>
-
-        </div>
-        <div class="w-full">
-            <form wire:submit.prevent="applyNewReasonToOperation" class="w-full space-y-4"">
+            <form wire:submit.prevent="applyNewReasonToOperation" class="w-full space-y-4">
             <flux:select
                 label="Motivo de Interrupção"
+                variant="listbox"
+                searchable
+                clearable
+                placeholder="Selecionar centro de trabalho..."
+                selected-suffix="centro(s) trabalho selecionado(s)"
+                empty="Sem resultados"
                 wire:model="reason">
-                    <flux:select.option value=""></flux:select.option>
+                <x-slot name="search">
+                    <flux:select.search class="px-4" placeholder="Pesquisar..." />
+                </x-slot>
                 @foreach($reasons as $interruptReason)
                     <flux:select.option value="{{ $interruptReason['codigo'] }}">
                         {{ $interruptReason['descricao'] }}

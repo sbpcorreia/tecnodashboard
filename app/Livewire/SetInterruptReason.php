@@ -40,6 +40,11 @@ class SetInterruptReason extends Component
         $this->user = $parameters['user'] ?? [];
         $this->logTouchStamp = $parameters['parameter'] ?? '';
 
+        if(empty($this->user) || empty($this->logTouchStamp)) {
+            Flux::toast("Ocorreu um erro ao abrir a janela de definição do motivo de paragem!", "Erro", 2000, "error");
+            return;
+        }
+
         $record = TouchLog::query()
         ->select([
             'u_logtouch.codct',
@@ -92,6 +97,11 @@ class SetInterruptReason extends Component
                 ->where('codigo', $this->reason)
                 ->value('u_tabprstamp');
 
+        if(!$interruptReasonStamp) {
+            Flux::toast("Deve indicar um motivo de interrupção!", "Aviso", 2000, "warning");
+            return;
+        }
+
         $inserted = TouchLog::insert([
             'u_logtouchstamp' => TouchLog::newId(),
             'datareg' => date('Y-m-d'),
@@ -109,10 +119,10 @@ class SetInterruptReason extends Component
             'tabprstamp' => $interruptReasonStamp,
             'lote' => $this->lot,
             'caixa' => '',
-            'ousrinis' => 'LOG',
+            'ousrinis' => $this->user["iniciais"],
             'ousrdata' => date('Y-m-d'),
             'ousrinis' => date('H:i:s'),
-            'usrinis' => 'LOG',
+            'usrinis' => $this->user["iniciais"],
             'usrdata' => date('Y-m-d'),
             'usrhora' => date('H:i:s'),
             'responsavel' => $this->resp
@@ -120,15 +130,9 @@ class SetInterruptReason extends Component
 
         $message = [];
         if($inserted) {
-            $message = [
-                "type" => "sucess",
-                "message" => "Motivo alterado com sucesso!"
-            ];
+            Flux::toast("Motivo de paragem alterado com sucesso!", "Atualizado", 2000, "success");
         } else {
-            $message = [
-                "type" => "error",
-                "message" => "Ocorreu um erro ao atualizar os dados"
-            ];
+            Flux::toast("Ocorreu um erro ao alterar o motivo de paragem!", "Erro", 2000, "error");
         }
 
 

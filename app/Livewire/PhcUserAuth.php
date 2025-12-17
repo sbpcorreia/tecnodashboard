@@ -47,13 +47,15 @@ class PhcUserAuth extends Component
             ->join('pe', 'pe.pestamp', '=', 'us.pestamp')
             ->join('pe2', 'pe2.pe2stamp', '=', 'pe.pestamp')
             ->where('pe2.u_rfid', $this->pin)
-            ->where('pe2.u_inactivo', 0)->first()->toArray();
+            ->where('pe2.u_inactivo', 0)->first();
+
 
         if(!$user) {
             $this->addError('pin', 'PIN inválido ou utilizador inactivo.');
             $this->pin = '';
             return;
         }
+
 
         if(!empty($this->targetModal)) {
             $extraParams = [
@@ -69,14 +71,20 @@ class PhcUserAuth extends Component
             'currentUser' => $user
         ]);
 
+        $username = mb_trim($user['nome'], 'UTF-8');
+
+        Flux::toast("Utilizador «{$username}» autenticado", "Autenticado", 2000, "success", "top-right");
+
         Flux::modal('pin-auth-modal')->close();
     }
 
     public function appendToPin($value) {
         $this->resetValidation();
 
-        if(strlen($this->pin) < 5) {
+        if(strlen($this->pin) < 4) {
             $this->pin .= $value;
+        } else {
+            return;
         }
 
     }

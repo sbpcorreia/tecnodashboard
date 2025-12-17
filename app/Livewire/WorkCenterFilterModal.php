@@ -49,6 +49,7 @@ class WorkCenterFilterModal extends Component
             'selectedInterruptReasons' => $this->selectedInterruptReasons
         ]);
         Flux::modal('wc-filter-modal')->close();
+
     }
 
 
