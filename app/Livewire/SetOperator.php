@@ -140,10 +140,10 @@ class SetOperator extends Component
             ->get()
             ->first();
 
-        $updated = TouchLog::where("u_logtouchstamp", $this->logTouchStamp)
-            ->update([
-               'pestamp' => $employee->pestamp
-            ]);
+        $logTouch = TouchLog::findOrFail($this->logTouchStamp);
+
+        $logTouch->pestamp = $employee->pestamp;
+        $logTouch->save();
 
         if(!$updated) {
             Flux::toast("Ocorreu um erro ao atualizar o registo de produção!", "Erro", 2000, "error");
