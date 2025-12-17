@@ -20,7 +20,7 @@ class WorkCenterFilterModal extends Component
 
     #[On('open-wc-filters')]
     public function setup() {
-        $this->reset(['selectedWorkCenters']);
+        $this->reset(['selectedWorkCenters', 'selectedInterruptReasons']);
         $this->resetValidation();
         $this->loadData();
         Flux::modal('wc-filter-modal')->show();
