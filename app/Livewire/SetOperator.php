@@ -139,9 +139,9 @@ class SetOperator extends Component
             ->first();
 
         $logTouch = TouchLog::findOrFail($this->logTouchStamp);
-        $logTouch->timestamps = false;
+        //$logTouch->timestamps = false;
         $logTouch->pestamp = $employee->pestamp;
-        $updated = $logTouch->save();
+        $updated = $logTouch->saveQuietly();
 
         if(!$updated) {
             Flux::toast("Ocorreu um erro ao atualizar o registo de produção!", "Erro", 2000, "error");
