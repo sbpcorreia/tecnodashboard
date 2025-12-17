@@ -18,12 +18,9 @@ class TouchLog extends Model
 
     protected $keyType = 'string';
 
-    public $timestamps = true;
-
-    const UPDATED_AT = 'usrdata';
-    const CREATED_AT = 'ousrdata';
-
-
+    public $timestamps = false;
+    const CREATED_AT = null;
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'datareg',
@@ -98,5 +95,4 @@ class TouchLog extends Model
     public static function newId() {
         return date('ymdHis') . '-' . substr(Str::uuid(), 0, 11);
     }
-
 }
