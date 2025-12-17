@@ -141,7 +141,7 @@ class SetOperator extends Component
             ->first();
 
         $logTouch = TouchLog::findOrFail($this->logTouchStamp);
-
+        $logTouch->timestamps = false;
         $logTouch->pestamp = $employee->pestamp;
         $logTouch->save();
 
