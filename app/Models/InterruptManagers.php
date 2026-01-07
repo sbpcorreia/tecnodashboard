@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InterruptManagers extends Model
 {
@@ -14,10 +13,4 @@ class InterruptManagers extends Model
     public $incrementing = false;
 
     protected $keyType = 'string';
-
-    public function joinInterruptReasons() : BelongsTo {
-        return $this->belongsTo(InterruptReasons::class, "tabprstamp", "u_tabprstamp");
-    }
-
-
 }

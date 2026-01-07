@@ -44,12 +44,12 @@ class SetInterruptReason extends Component
     public string $manager = '';
     //public $reasons = [];
 
-    public function updatedReason($value) {
+    public function updatedReason() : void {
         $this->reset('manager');
     }
 
     #[On('open-set-interrupt-reason')]
-    public function updateInterruptReasons($parameters) {
+    public function updateInterruptReasons($parameters) : void {
         $this->user = $parameters['user'] ?? [];
         $this->logTouchStamp = $parameters['parameter'] ?? '';
 
@@ -101,7 +101,7 @@ class SetInterruptReason extends Component
         Flux::modal('set-interrupt-reason-modal')->show();
     }
 
-    #[Computed()]
+    #[Computed]
     public function reasons() : array {
         $reasons = InterruptReasons::query()
             ->where("inactivo", 0)
@@ -113,7 +113,7 @@ class SetInterruptReason extends Component
     }
 
 
-    #[Computed()]
+    #[Computed]
     public function managers() : array {
 
         $reasonObject = InterruptReasons::query()
@@ -131,7 +131,7 @@ class SetInterruptReason extends Component
         return $managers->toArray();
     }
 
-    public function applyNewReasonToOperation() {
+    public function applyNewReasonToOperation() : void {
 
         $interruptReasonStamp = InterruptReasons::query()
                 ->where('codigo', $this->reason)
@@ -161,7 +161,7 @@ class SetInterruptReason extends Component
             'caixa' => '',
             'ousrinis' => $this->user["iniciais"],
             'ousrdata' => date('Y-m-d'),
-            'ousrinis' => date('H:i:s'),
+            'ousrhora' => date('H:i:s'),
             'usrinis' => $this->user["iniciais"],
             'usrdata' => date('Y-m-d'),
             'usrhora' => date('H:i:s'),
@@ -182,7 +182,7 @@ class SetInterruptReason extends Component
     }
 
 
-    public function render()
+    public function render() : \Illuminate\View\View
     {
         return view('livewire.set-interrupt-reason');
     }

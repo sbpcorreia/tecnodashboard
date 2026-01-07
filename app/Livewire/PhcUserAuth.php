@@ -19,7 +19,7 @@ class PhcUserAuth extends Component
     public string $parameters = '';
 
     #[On('open-pin-modal')]
-    public function setup($targetModal = '', $parameters = '')
+    public function setup($targetModal = '', $parameters = '') : void
     {
         $this->reset('pin');
         $this->resetValidation();
@@ -29,7 +29,7 @@ class PhcUserAuth extends Component
         Flux::modal('pin-auth-modal')->show();
     }
 
-    public function authenticateUser() {
+    public function authenticateUser() : void {
         $user = PhcUser::query()
             ->select([
                 'pe.pestamp',
@@ -78,32 +78,29 @@ class PhcUserAuth extends Component
         Flux::modal('pin-auth-modal')->close();
     }
 
-    public function appendToPin($value) {
+    public function appendToPin($value) : void {
         $this->resetValidation();
 
         if(strlen($this->pin) < 5) {
             $this->pin .= $value;
-        } else {
-            return;
         }
-
     }
 
-    public function clearPin() {
+    public function clearPin() : void {
         $this->pin = '';
     }
 
-    public function cancel() {
+    public function cancel() : void {
         $this->reset('pin');
         $this->resetValidation();
         Flux::modal('pin-auth-modal')->close();
     }
 
-    public function backspacePin() {
+    public function backspacePin() : void {
         $this->pin = substr($this->pin, 0, -1);
     }
 
-    public function render()
+    public function render() : \Illuminate\View\View
     {
         return view('livewire.phc-user-auth');
     }

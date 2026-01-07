@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Models\TouchLog;
 use Flux\Flux;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
-use Illuminate\Support\Arr;
 use Carbon\Carbon;
+use Throwable;
 
 #[Title("Centros de trabalho - Tecnolanema")]
 class WorkCenter extends BaseComponent
@@ -27,7 +28,7 @@ class WorkCenter extends BaseComponent
     ];
 
     #[On('filters-applied')]
-    public function applyFilters($events) {
+    public function applyFilters($events) : void {
         $this->selectedWorkCenters = $events["selectedWorkCenters"] ?? [];
         $this->selectedInterruptReasons = $events["selectedInterruptReasons"] ?? [];
         $this->filteredData = true;
@@ -35,21 +36,21 @@ class WorkCenter extends BaseComponent
         Flux::toast("Filtro aplicado", "Sucesso", 2000, "success");
     }
 
-    public function clearFilters() {
+    public function clearFilters() : void {
         $this->selectedWorkCenters = [];
         $this->selectedInterruptReasons = [];
         $this->filteredData = false;
         Flux::toast("Filtros removidos", "Aviso", 2000, "warning");
     }
 
-    public function updateWorkCenter($event) {
+    public function updateWorkCenter($event) : void {
         $id = $event['workCenter']['id'];
         $this->interruptedWorkCenters[$id] = $event['workCenter'];
         Flux::toast("Painel actualizado", "Sucesso", "success", "top-right");
     }
 
     #[Computed]
-    public function interruptedWorkCenters()
+    public function interruptedWorkCenters() : Collection
     {
         $this->reset(['messages']);
         $query = TouchLog::query()
@@ -116,7 +117,7 @@ class WorkCenter extends BaseComponent
                 $stoppedAtCarbon = Carbon::createFromFormat($format, $operation->datahora);
                 $operation->stopped_at = $stoppedAtCarbon->timestamp * 1000;
 
-            } catch (\Throwable $th) {
+            } catch (Throwable $th) {
                 $operation->stopped_at = 0;
             }
             return $operation;
@@ -126,14 +127,14 @@ class WorkCenter extends BaseComponent
     }
 
     #[On('update-work-center')]
-    public function refreshWorkCenters($params = []) {
+    public function refreshWorkCenters($params = []) : void {
         // Limpa a cache da computed property para forçar re-consulta na base de dados
         unset($this->interruptedWorkCenters);
         Flux::toast("Painel atualizado", "Info", 2000, "success", "top-right");
         // O Livewire encarrega-se de renderizar novamente
     }
 
-    public function removeCard(array $eventData) {
+    public function removeCard(array $eventData) : void {
         $operationId = $eventData['u_tabofopstamp'] ?? null;
 
         if(!$operationId) {
@@ -144,7 +145,7 @@ class WorkCenter extends BaseComponent
         $this->removeIds[] = $operationId;
     }
 
-    public function render()
+    public function render() : \Illuminate\View\View
     {
         return view('livewire.work-center', [
             'interruptedWorkCenters' => $this->interruptedWorkCenters

@@ -41,7 +41,7 @@ class SetOperator extends Component
     public $operators = [];
 
     #[On('open-set-operator')]
-    public function updateOperator($parameters) {
+    public function updateOperator($parameters) : void {
 
 
         $this->user = $parameters['user'] ?? [];
@@ -108,7 +108,7 @@ class SetOperator extends Component
             ->where("status", "=", 1)
             ->where("area", "=", "Tecnolanema")
             ->where("pestamp", "<>", $this->currentPeStamp)
-            ->orderBy("nome", "asc")
+            ->orderBy("nome")
             ->get();
 
         if(!$operators) {
@@ -133,11 +133,6 @@ class SetOperator extends Component
             return;
         }
 
-        $employee = Employees::query()
-            ->where("pestamp", "=", $this->operator)
-            ->get()
-            ->first();
-
         $updated = DB::table('u_logtouch')
             ->where('u_logtouchstamp', $this->logTouchStamp)
             ->update([
@@ -158,7 +153,7 @@ class SetOperator extends Component
     }
 
 
-    public function render()
+    public function render() : \Illuminate\View\View
     {
         return view('livewire.set-operator');
     }
