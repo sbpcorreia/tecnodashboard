@@ -80,7 +80,7 @@
                                 <div class="mt-3 pt-3 flex flex-row justify-between items-center">
                                     <div class="flex flex-row items-center gap-2">
                                         <span class="text-yellow-900/70"><flux:icon.user variant="micro"/></span>
-                                        <p class="text-md text-gray-800">{{empty($workCenter->responsavel) ? 'Sem responsável definido' : $workCenter->responsavel }} </p>
+                                        <p class="text-md text-gray-800">{{empty($workCenter->responsavel) ? 'Sem responsável definido' : $workCenter->responsavel }}</p>
                                     </div>
                                 </div>
 
