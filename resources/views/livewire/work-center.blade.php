@@ -73,17 +73,16 @@
                                 </div>
                                 <div class="mt-3 pt-3 flex flex-row justify-between items-center">
                                     <div class="flex flex-row items-center gap-2">
-                                        <span class="text-yellow-900/70"><flux:icon.user variant="micro"/></span>
+                                        <span class="text-yellow-900/70"><flux:icon.wrench variant="micro"/></span>
                                         <p class="text-md text-gray-800">{{$workCenter->nome}}</p>
                                     </div>
-                                    <flux:tooltip content="Alterar utilizador" placement="top">
-                                        <flux:button variant="primary" color="orange" size="sm" square wire:click="$dispatch('open-pin-modal', { targetModal: 'set-operator', parameters: '{{ $workCenter->u_logtouchstamp }}' })">
-                                            <flux:icon.pencil variant="mini" />
-                                        </flux:button>
-                                    </flux:tooltip>
-
                                 </div>
-
+                                <div class="mt-3 pt-3 flex flex-row justify-between items-center">
+                                    <div class="flex flex-row items-center gap-2">
+                                        <span class="text-yellow-900/70"><flux:icon.user variant="micro"/></span>
+                                        <p class="text-md text-gray-800">{{empty($workCenter->responsavel) ? 'Sem responsável definido' : $workCenter->responsavel }}</p>
+                                    </div>
+                                </div>
 
                             </div>
                         @endforeach

@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Models\InterruptManagers;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use App\Models\TouchLog;
 use App\Models\InterruptReasons;
@@ -33,7 +35,18 @@ class SetInterruptReason extends Component
     public string $lot = '';
 
     public string $reason = '';
-    public $reasons = [];
+
+    public string $currentReason = '';
+    public string $currentManager = '';
+    public string $currentEmployee = '';
+
+    //public $managers = [];
+    public string $manager = '';
+    //public $reasons = [];
+
+    public function updatedReason($value) {
+        $this->reset('manager');
+    }
 
     #[On('open-set-interrupt-reason')]
     public function updateInterruptReasons($parameters) {
@@ -46,24 +59,27 @@ class SetInterruptReason extends Component
         }
 
         $record = TouchLog::query()
-        ->select([
-            'u_logtouch.codct',
-            'u_logtouch.tabofopstamp',
-            'u_tabof.numof',
-            'u_tabof.u_tabofstamp',
-            'u_logtouch.tabprstamp',
-            DB::raw('u_tabofop.descricao AS descop'),
-            'u_tabofop.numop',
-            'u_tabct.u_tabctstamp',
-            'u_logtouch.bistamp',
-            'u_logtouch.responsavel',
-            'u_logtouch.posto',
-            'u_logtouch.lote'
-        ])
-        ->join("u_tabofop", "u_tabofop.u_tabofopstamp", "=", "u_logtouch.tabofopstamp")
-        ->join("u_tabof", "u_tabof.u_tabofstamp", "=", "u_tabofop.u_tabofstamp")
-        ->join("u_tabct", "u_tabct.codct", "=", "u_logtouch.codct")
-        ->where("u_logtouchstamp", $this->logTouchStamp)->first();
+            ->select([
+                'u_logtouch.codct',
+                'u_logtouch.tabofopstamp',
+                'u_tabof.numof',
+                'u_tabof.u_tabofstamp',
+                'u_logtouch.tabprstamp',
+                DB::raw('u_tabofop.descricao AS descop'),
+                'u_tabofop.numop',
+                'u_tabct.u_tabctstamp',
+                'u_logtouch.bistamp',
+                'u_logtouch.responsavel',
+                'u_logtouch.posto',
+                'u_logtouch.lote',
+                'u_tabpr.codigo AS codpr',
+                'u_tabpr.descricao AS motivo'
+            ])
+            ->join("u_tabofop", "u_tabofop.u_tabofopstamp", "=", "u_logtouch.tabofopstamp")
+            ->join("u_tabof", "u_tabof.u_tabofstamp", "=", "u_tabofop.u_tabofstamp")
+            ->join("u_tabct", "u_tabct.codct", "=", "u_logtouch.codct")
+            ->join("u_tabpr", "u_tabpr.u_tabprstamp", "=", "u_logtouch.tabprstamp")
+            ->where("u_logtouchstamp", $this->logTouchStamp)->first();
         if($record) {
             $this->workCenterCode = $record->codct;
             $this->workOrderCode = $record->numof;
@@ -72,23 +88,47 @@ class SetInterruptReason extends Component
             $this->operationDescription = $record->descop;
             $this->workOrderStamp = $record->u_tabofstamp;
             $this->workCenterStamp = $record->u_tabctstamp;
-            $this->terminal = $record->posto;
-
             $this->resp = $record->responsavel;
             $this->bistamp = $record->bistamp;
             $this->lot = $record->lote;
             $this->terminal = $record->posto;
+            $this->currentReason = $record->motivo;
+            $this->currentManager = $record->responsavel;
+            $this->reason = $record->codpr;
+            $this->manager = $record->responsavel;
         }
 
+        Flux::modal('set-interrupt-reason-modal')->show();
+    }
+
+    #[Computed()]
+    public function reasons() : array {
         $reasons = InterruptReasons::query()
             ->where("inactivo", 0)
-            ->where('u_tabprstamp', '<>', $record->tabprstamp)
-            ->orderBy("codigo", "asc")
+            ->where('oculto', 0)
+            ->orderBy("codigo")
             ->get();
 
-        $this->reasons = $reasons->toArray();
+        return $reasons->toArray();
+    }
 
-        Flux::modal('set-interrupt-reason-modal')->show();
+
+    #[Computed()]
+    public function managers() : array {
+
+        $reasonObject = InterruptReasons::query()
+            ->where("codigo", "=", $this->reason)
+            ->first();
+
+        $reason = $reasonObject->u_tabprstamp ?? '';
+
+        $managers = InterruptManagers::query()
+            ->where("u_tabprstamp", "=", $reason)
+            ->orderBy("respnom")
+            ->get();
+
+
+        return $managers->toArray();
     }
 
     public function applyNewReasonToOperation() {

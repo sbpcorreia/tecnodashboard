@@ -123,7 +123,7 @@ class SetOperator extends Component
 
     }
 
-    public function setNewOperator() {
+    public function setNewOperator() : void {
         $operator = Employees::query()
             ->where("pestamp", "=", $this->operator)
             ->value('pestamp');

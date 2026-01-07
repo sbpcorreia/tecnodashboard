@@ -57,6 +57,7 @@ class WorkCenter extends BaseComponent
                 DB::raw('u_logtouch.codct + u_logtouch.tabofopstamp AS id'),
                 'u_logtouch.u_logtouchstamp',
                 'u_logtouch.tipo',
+                'u_logtouch.responsavel',
                 DB::raw('u_logtouch.datareg + u_logtouch.horareg AS datahora'),
                 'u_tabct.u_tabctstamp',
                 'u_tabct.codct',

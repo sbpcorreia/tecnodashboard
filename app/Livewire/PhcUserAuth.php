@@ -81,7 +81,7 @@ class PhcUserAuth extends Component
     public function appendToPin($value) {
         $this->resetValidation();
 
-        if(strlen($this->pin) < 4) {
+        if(strlen($this->pin) < 5) {
             $this->pin .= $value;
         } else {
             return;

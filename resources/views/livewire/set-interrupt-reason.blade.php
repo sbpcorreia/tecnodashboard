@@ -14,6 +14,10 @@
                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $workOrderCode }} / {{ $operationDescription }}</dd>
                         <dt class="text-sm/6 font-medium text-gray-900">Utilizador atual</dt>
                         <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $user["nome"] ?? '' }}</dd>
+                        <dt class="text-sm/6 font-medium text-gray-900">Interrupção atual</dt>
+                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ $currentReason ?? '' }}</dd>
+                        <dt class="text-sm/6 font-medium text-gray-900">Responsável atual</dt>
+                        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ empty($currentManager) ? 'Sem responsável definido' : $currentManager }}</dd>
                     </dl>
                 </div>
             </div>
@@ -21,7 +25,7 @@
         </div>
         <div class="w-full">
             <form wire:submit.prevent="applyNewReasonToOperation" class="w-full space-y-4">
-            <flux:select
+                <flux:select
                 label="Motivo de Interrupção"
                 variant="listbox"
                 searchable
@@ -29,16 +33,37 @@
                 placeholder="Selecionar centro de trabalho..."
                 selected-suffix="centro(s) trabalho selecionado(s)"
                 empty="Sem resultados"
-                wire:model="reason">
+                wire:model.live="reason"
+                >
                 <x-slot name="search">
                     <flux:select.search class="px-4" placeholder="Pesquisar..." />
                 </x-slot>
-                @foreach($reasons as $interruptReason)
+                @foreach($this->reasons as $interruptReason)
                     <flux:select.option value="{{ $interruptReason['codigo'] }}">
                         {{ $interruptReason['descricao'] }}
                     </flux:select.option>
                 @endforeach
-            </flux:select>
+                </flux:select>
+
+                <flux:select
+                    label="Responsável"
+                    variant="listbox"
+                    searchable
+                    clearable
+                    placeholder="Selecionar responsável..."
+                    selected-suffix="responsável selecionado"
+                    empty="Sem resultados"
+                    wire:model.live="manager"
+                >
+                    <x-slot name="search">
+                        <flux:select.search class="px-4" placeholder="Pesquisar..." />
+                    </x-slot>
+                    @foreach($this->managers as $man)
+                        <flux:select.option value="{{ $man['respnom'] }}">
+                            {{ $man['respnom'] }}
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
 
             <div class="flex justify-end gap-2 mt-4">
                 <flux:button type="submit" variant="primary" color="blue">Aplicar Motivo</flux:button>

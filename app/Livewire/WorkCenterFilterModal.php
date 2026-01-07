@@ -7,8 +7,7 @@ use App\Models\WorkCenters;
 use App\Models\InterruptReasons;
 use Livewire\Attributes\On;
 use Flux\Flux;
-use Illuminate\Database\Eloquent\Collection;
-
+use Illuminate\View\View;
 class WorkCenterFilterModal extends Component
 {
 
@@ -19,14 +18,14 @@ class WorkCenterFilterModal extends Component
     public $interruptReasons = [];
 
     #[On('open-wc-filters')]
-    public function setup() {
+    public function setup() : void {
         $this->reset(['selectedWorkCenters', 'selectedInterruptReasons']);
         $this->resetValidation();
         $this->loadData();
         Flux::modal('wc-filter-modal')->show();
     }
 
-    public function loadData() {
+    public function loadData() : void {
         $this->workCenters = WorkCenters::query()
             ->select([
                 'codct',
@@ -34,16 +33,16 @@ class WorkCenterFilterModal extends Component
             ])
             ->where("inactivo", 0)
             ->where("noonline", 0)
-            ->orderBy("codct", "asc")
+            ->orderBy("codct")
             ->get()->toArray();
 
         $this->interruptReasons = InterruptReasons::query()
             ->where("inactivo", 0)
-            ->orderBy("codigo", "asc")
+            ->orderBy("codigo")
             ->get()->toArray();
     }
 
-    public function applyFilters() {
+    public function applyFilters() : void {
         $this->dispatch('filters-applied', [
             'selectedWorkCenters' => $this->selectedWorkCenters,
             'selectedInterruptReasons' => $this->selectedInterruptReasons
@@ -53,7 +52,7 @@ class WorkCenterFilterModal extends Component
     }
 
 
-    public function render()
+    public function render() : View
     {
         return view('livewire.work-center-filter-modal');
     }
