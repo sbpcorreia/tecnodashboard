@@ -165,7 +165,7 @@ class SetInterruptReason extends Component
             'usrinis' => $this->user["iniciais"],
             'usrdata' => date('Y-m-d'),
             'usrhora' => date('H:i:s'),
-            'responsavel' => $this->resp
+            'responsavel' => $this->$manager
         ]);
 
         $message = [];
