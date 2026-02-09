@@ -40,6 +40,8 @@ class SetInterruptReason extends Component
     public string $currentManager = '';
     public string $currentEmployee = '';
 
+    public string $peStamp = '';
+
     //public $managers = [];
     public string $manager = '';
     //public $reasons = [];
@@ -73,7 +75,8 @@ class SetInterruptReason extends Component
                 'u_logtouch.posto',
                 'u_logtouch.lote',
                 'u_tabpr.codigo AS codpr',
-                'u_tabpr.descricao AS motivo'
+                'u_tabpr.descricao AS motivo',
+                'u_logtouch.pestamp'
             ])
             ->join("u_tabofop", "u_tabofop.u_tabofopstamp", "=", "u_logtouch.tabofopstamp")
             ->join("u_tabof", "u_tabof.u_tabofstamp", "=", "u_tabofop.u_tabofstamp")
@@ -96,6 +99,7 @@ class SetInterruptReason extends Component
             $this->currentManager = $record->responsavel;
             $this->reason = $record->codpr;
             $this->manager = $record->responsavel;
+            $this->peStamp = $record->pestamp;
         }
 
         Flux::modal('set-interrupt-reason-modal')->show();
@@ -151,7 +155,7 @@ class SetInterruptReason extends Component
             'tabofopstamp' => $this->operationStamp,
             'numof' => $this->workOrderCode,
             'codct' => $this->workCenterCode,
-            'pestamp' => $this->user['pestamp'] ?? '',
+            'pestamp' => $this->peStamp ?? '',
             'tipo' => 2,
             'etiquetastamp' => '',
             'bistamp' => $this->bistamp,
