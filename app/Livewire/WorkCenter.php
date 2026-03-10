@@ -73,10 +73,9 @@ class WorkCenter extends BaseComponent
                 'u_tabof.ref',
                 'u_tabof.design',
                 'pe.nome',
-                // Nota: Window functions são pesadas. Certifique-se que tem índices em (datareg, horareg)
                 DB::raw('ROW_NUMBER() OVER (
                     PARTITION BY u_tabct.u_tabctstamp, u_tabofop.u_tabofopstamp
-                    ORDER BY u_logtouch.datareg DESC, u_logtouch.horareg DESC, u_tabof.u_tabofstamp DESC, u_tabofop.u_tabofopstamp
+                    ORDER BY u_logtouch.datareg + u_logtouch.horareg DESC, u_tabof.u_tabofstamp DESC, u_tabofop.u_tabofopstamp
                 ) AS rn')
             ])
             ->join("u_tabct", "u_tabct.codct", "=", "u_logtouch.codct")
