@@ -11,7 +11,7 @@
         @foreach ($interruptedWorkCenters->groupBy('codct') as $codCt => $itemsDoGrupo)
 
             {{-- 2. Aqui desenhamos o "Container" do Grupo (Accordion ou Card Grande) --}}
-            <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white">
+            <div wire:key="group-{{ $codCt }}" class="border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white">
 
                 {{-- Cabeçalho do Grupo (Ocupa a largura toda) --}}
                 <div class="bg-gray-100 p-4 border-b border-gray-200 flex justify-between items-center">
@@ -30,7 +30,7 @@
 
                         {{-- Loop interno apenas com os cartões deste grupo específico --}}
                         @foreach ($itemsDoGrupo as $workCenter)
-                            <div class="bg-yellow-400 p-4 border border-yellow-600 rounded-sm relative shadow-sm">
+                            <div wire:key="wc-{{ $workCenter->u_logtouchstamp }}" class="bg-yellow-400 p-4 border border-yellow-600 rounded-sm relative shadow-sm">
 
                                 <flux:tooltip content="Alterar motivo de interrupção" placement="top">
                                     <flux:button variant="primary" color="orange" size="sm" square class="!absolute top-2 right-2" wire:click="$dispatch('open-pin-modal', { targetModal: 'set-interrupt-reason', parameters: '{{ $workCenter->u_logtouchstamp }}' })">
