@@ -72,6 +72,7 @@ class WorkCenter extends BaseComponent
                 'u_tabpr.descricao AS motivo',
                 'u_tabof.ref',
                 'u_tabof.design',
+                'u_tabpr.oculto',
                 'pe.nome',
                 DB::raw('ROW_NUMBER() OVER (
                     PARTITION BY u_tabct.u_tabctstamp, u_tabofop.u_tabofopstamp
@@ -90,8 +91,7 @@ class WorkCenter extends BaseComponent
             ->join("u_tabpr", "u_tabpr.u_tabprstamp", "=", "u_logtouch.tabprstamp")
             ->join("pe", "pe.pestamp", "=", "u_logtouch.pestamp")
             ->where("u_tabct.inactivo", 0)
-            ->where("u_tabct.noonline", 0)
-            ->where("u_tabpr.oculto", 0);
+            ->where("u_tabct.noonline", 0);
 
         // Aplicação dos Filtros
         if (!empty($this->selectedWorkCenters)) {
@@ -106,8 +106,10 @@ class WorkCenter extends BaseComponent
 
         $interruptedOperations = $results->filter(function($item) {
             // Mantém se for rn=1 E se o ID NÃO estiver na lista de removidos
-            return $item->rn == 1 && !in_array($item->u_tabofopstamp, $this->removeIds);
+            return $item->rn == 1 && !$item->oculto && !in_array($item->u_tabofopstamp, $this->removeIds);
         });
+
+
 
         $interruptedOperations = $interruptedOperations->map(function ($operation) {
             $format = 'Y-m-d H:i:s.000';

@@ -30,6 +30,7 @@
 
                         {{-- Loop interno apenas com os cartões deste grupo específico --}}
                         @foreach ($itemsDoGrupo as $workCenter)
+
                             <div wire:key="wc-{{ $workCenter->u_logtouchstamp }}" class="bg-yellow-400 p-4 border border-yellow-600 rounded-sm relative shadow-sm">
 
                                 <flux:tooltip content="Alterar motivo de interrupção" placement="top">
