@@ -93,15 +93,6 @@ class WorkCenter extends BaseComponent
             ->where("u_tabct.inactivo", 0)
             ->where("u_tabct.noonline", 0);
 
-        // Aplicação dos Filtros
-        if (!empty($this->selectedWorkCenters)) {
-            $query->whereIn('u_tabct.codct', $this->selectedWorkCenters);
-        }
-
-        if (!empty($this->selectedInterruptReasons)) {
-            $query->whereIn('u_tabpr.codigo', $this->selectedInterruptReasons);
-        }
-
         $results = $query->get();
 
         $interruptedOperations = $results->filter(function($item) {
@@ -109,7 +100,19 @@ class WorkCenter extends BaseComponent
             return $item->rn == 1 && !$item->oculto && !in_array($item->u_tabofopstamp, $this->removeIds);
         });
 
+        // Aplicação dos Filtros
+        if (!empty($this->selectedWorkCenters)) {
+            $interruptedOperations = $interruptedOperations->filter(function($item) {
+                return in_array($item->codct, $this->$selectedWorkCenters); 
+            });
+        }
 
+        if (!empty($this->selectedInterruptReasons)) {
+            $interruptedOperations = $interruptedOperations->filter(function($item) {
+                return in_array($item->codpr, $this->selectedInterruptReasons);
+            });
+        }
+        
 
         $interruptedOperations = $interruptedOperations->map(function ($operation) {
             $format = 'Y-m-d H:i:s.000';
