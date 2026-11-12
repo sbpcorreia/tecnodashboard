@@ -62,7 +62,7 @@ class CheckWorkCentersStatus extends Command
             ])
             ->join("u_tabct", "u_tabct.codct", "=", "u_logtouch.codct")
             ->join("u_tabofop", "u_tabofop.u_tabofopstamp", "=", "u_logtouch.tabofopstamp")
-            ->join("u_tabof", "u_tabof.u_tabofstamp", "=", "u_tabofopstamp.u_tabofstamp")
+            ->join("u_tabof", "u_tabof.u_tabofstamp", "=", "u_tabofop.u_tabofstamp")
             ->leftJoin("u_tabpr", "u_tabpr.u_tabprstamp", "=", "u_logtouch.tabprstamp")
             ->join("pe", "pe.pestamp", "=", "u_logtouch.pestamp")
             ->where("u_tabct.inactivo", 0)
@@ -84,7 +84,7 @@ class CheckWorkCentersStatus extends Command
         }
 
         foreach($results as $operation) {
-            if(in_array([1,3], $operation->tipo) || $operation->of_status == 5 || $operation->op_status == 5) {
+            if(in_array($operation->tipo, [1,3]) || $operation->of_status == 5 || $operation->op_status == 5) {
                 $extractedOperationIds->push($operation->u_tabofopstamp);
             }
         }
