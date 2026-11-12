@@ -2,14 +2,8 @@
 
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
-use Livewire\Volt\Volt;
 use App\Livewire\WorkCenter;
-use Livewire\Livewire;
 
-Livewire::setUpdateRoute(function ($handle) {
-    return Route::post('/tecnodashboard/public/livewire/update', $handle)->name('custom');
-});
 
 Route::get('/', WorkCenter::class);
 

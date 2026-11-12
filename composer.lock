@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e7bc729b68623a7dc8122e97df05cba6",
+    "content-hash": "e4c346e9ce3bf669e06dfc49f240e0f1",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -663,77 +663,6 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
-        },
-        {
-            "name": "emkcloud/livewire-tweak",
-            "version": "1.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/emkcloud/livewire-tweak.git",
-                "reference": "fa25bb5e5d3c4bf6d636fc06056f215507a52693"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/emkcloud/livewire-tweak/zipball/fa25bb5e5d3c4bf6d636fc06056f215507a52693",
-                "reference": "fa25bb5e5d3c4bf6d636fc06056f215507a52693",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^12.0|^13.0",
-                "livewire/livewire": "^3.7|^4.2"
-            },
-            "conflict": {
-                "livewire/flux": ">=3.0"
-            },
-            "require-dev": {
-                "laravel/pint": "^1.29",
-                "livewire/flux": "^2.1",
-                "orchestra/testbench": "^10.2",
-                "pestphp/pest": "^3.8"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Emkcloud\\LivewireTweak\\Providers\\LivewireTweakServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Emkcloud\\LivewireTweak\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Massimo Della Rovere",
-                    "email": "dellarovere@duck.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Tweaks and overrides for Livewire packages",
-            "homepage": "https://github.com/emkcloud/livewire-tweak",
-            "keywords": [
-                "assets",
-                "flux",
-                "laravel",
-                "livewire"
-            ],
-            "support": {
-                "issues": "https://github.com/emkcloud/livewire-tweak/issues",
-                "source": "https://github.com/emkcloud/livewire-tweak/tree/1.7.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/emkcloud",
-                    "type": "github"
-                }
-            ],
-            "time": "2026-03-24T02:44:46+00:00"
         },
         {
             "name": "fruitcake/php-cors",

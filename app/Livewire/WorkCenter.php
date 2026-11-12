@@ -20,12 +20,6 @@ class WorkCenter extends BaseComponent
     public $selectedInterruptReasons = [];
     public $filteredData = false;
     public $messages = [];
-    public $removeIds = [];
-
-    protected $listeners = [
-        "echo:workCenter,UpdateWorkCenter" => "refreshWorkCenters",
-        "echo:workCenterStatus,RemoveCard" => "removeCard"
-    ];
 
     #[On('filters-applied')]
     public function applyFilters($events) : void {
@@ -72,11 +66,11 @@ class WorkCenter extends BaseComponent
                 'u_tabpr.descricao AS motivo',
                 'u_tabof.ref',
                 'u_tabof.design',
-                'u_tabpr.oculto',
+                DB::raw('ISNULL(u_tabpr.oculto, 0) AS oculto'),
                 'pe.nome',
                 DB::raw('ROW_NUMBER() OVER (
                     PARTITION BY u_tabct.u_tabctstamp, u_tabofop.u_tabofopstamp
-                    ORDER BY u_logtouch.datareg + u_logtouch.horareg DESC, u_tabof.u_tabofstamp DESC, u_tabofop.u_tabofopstamp
+                    ORDER BY u_logtouch.datareg + u_logtouch.horareg DESC, u_logtouch.u_logtouchstamp DESC
                 ) AS rn')
             ])
             ->join("u_tabct", "u_tabct.codct", "=", "u_logtouch.codct")
@@ -88,31 +82,28 @@ class WorkCenter extends BaseComponent
                 $join->on("u_tabof.u_tabofstamp", "=", "u_tabofop.u_tabofstamp")
                      ->where("u_tabof.idto", "<>", 5);
             })
-            ->join("u_tabpr", "u_tabpr.u_tabprstamp", "=", "u_logtouch.tabprstamp")
-            ->join("pe", "pe.pestamp", "=", "u_logtouch.pestamp")
+            // LEFT JOIN: os registos de arranque/fim (tipo 1 e 3) não têm motivo nem,
+            // por vezes, operador. Com INNER JOIN eram excluídos do ROW_NUMBER e a
+            // última paragem continuava a aparecer depois de a operação ter retomado.
+            ->leftJoin("u_tabpr", "u_tabpr.u_tabprstamp", "=", "u_logtouch.tabprstamp")
+            ->leftJoin("pe", "pe.pestamp", "=", "u_logtouch.pestamp")
+            // Só os registos que mudam o estado da operação: 1 = início, 2 = paragem, 3 = fim
+            ->whereIn("u_logtouch.tipo", [1, 2, 3])
             ->where("u_tabct.inactivo", 0)
             ->where("u_tabct.noonline", 0);
 
-        $results = $query->get();
+        // Os filtros são aplicados no SQL Server: fica apenas o último registo de cada
+        // operação (rn = 1) e só se esse último registo for uma paragem (tipo = 2).
+        $interruptedOperations = DB::query()
+            ->fromSub($query, 't')
+            ->where('t.rn', 1)
+            ->where('t.tipo', 2)
+            ->where('t.oculto', 0)
+            ->when(!empty($this->selectedWorkCenters), fn ($q) => $q->whereIn('t.codct', $this->selectedWorkCenters))
+            ->when(!empty($this->selectedInterruptReasons), fn ($q) => $q->whereIn('t.codpr', $this->selectedInterruptReasons))
+            ->orderBy('t.codct')
+            ->get();
 
-        $interruptedOperations = $results->filter(function($item) {
-            // Mantém se for rn=1 E se o ID NÃO estiver na lista de removidos
-            return $item->rn == 1 && !$item->oculto && !in_array($item->u_tabofopstamp, $this->removeIds);
-        });
-
-        // Aplicação dos Filtros
-        if (!empty($this->selectedWorkCenters)) {
-            $interruptedOperations = $interruptedOperations->filter(function($item) {
-                return in_array($item->codct, $this->$selectedWorkCenters); 
-            });
-        }
-
-        if (!empty($this->selectedInterruptReasons)) {
-            $interruptedOperations = $interruptedOperations->filter(function($item) {
-                return in_array($item->codpr, $this->selectedInterruptReasons);
-            });
-        }
-        
 
         $interruptedOperations = $interruptedOperations->map(function ($operation) {
             $format = 'Y-m-d H:i:s.000';
@@ -138,21 +129,13 @@ class WorkCenter extends BaseComponent
         // O Livewire encarrega-se de renderizar novamente
     }
 
-    public function removeCard(array $eventData) : void {
-        $operationId = $eventData['u_tabofopstamp'] ?? null;
-
-        if(!$operationId) {
-            return;
-        }
-
-
-        $this->removeIds[] = $operationId;
-    }
 
     public function render() : \Illuminate\View\View
     {
         return view('livewire.work-center', [
-            'interruptedWorkCenters' => $this->interruptedWorkCenters
+            'interruptedWorkCenters' => $this->interruptedWorkCenters,
+            // Intervalo da atualização automática (config/dashboard.php), mínimo 15 s
+            'refreshSeconds' => max(15, (int) config('dashboard.refresh_seconds', 300)),
         ]);
     }
 }

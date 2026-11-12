@@ -1,6 +1,6 @@
 <div class="w-full h-full" xmlns:flex="http://www.w3.org/1999/html">
 
-@if(empty($interruptedWorkCenters))
+@if($interruptedWorkCenters->isEmpty())
     <div class="text-center text-gray-500 flex justify-center place-items-center h-full text-2xl">
         Não existem centros de trabalho interrompidos no momento.
     </div>
@@ -94,7 +94,91 @@
         @endforeach
     </div>
 @endif
-    <div class="!fixed bottom-6 right-6 flex gap-2">
+    {{--
+        Atualização automática: a contagem decrescente fica visível para o utilizador,
+        avisa nos últimos 10 segundos e pára sempre que uma janela (PIN, motivo de
+        paragem, operador, filtros) está aberta. Ao fechar a janela, recomeça do início.
+    --}}
+    <div class="!fixed bottom-6 right-6 flex items-center gap-2"
+         x-data="{
+            interval: {{ $refreshSeconds }},
+            remaining: {{ $refreshSeconds }},
+            deadline: 0,
+            paused: false,
+            refreshing: false,
+            timer: null,
+
+            init() {
+                this.restart();
+                this.timer = setInterval(() => this.tick(), 1000);
+            },
+
+            destroy() {
+                clearInterval(this.timer);
+            },
+
+            tick() {
+                // Qualquer modal do Flux aberto (é um <dialog open>) suspende a contagem
+                if (document.querySelector('dialog[open]')) {
+                    this.paused = true;
+                    return;
+                }
+
+                if (this.paused) {
+                    this.paused = false;
+                    this.restart();
+                    return;
+                }
+
+                if (this.refreshing) return;
+
+                this.remaining = Math.max(0, Math.ceil((this.deadline - Date.now()) / 1000));
+
+                if (this.remaining === 0) this.refreshNow();
+            },
+
+            restart() {
+                this.deadline = Date.now() + this.interval * 1000;
+                this.remaining = this.interval;
+            },
+
+            async refreshNow() {
+                if (this.refreshing) return;
+                this.refreshing = true;
+                try {
+                    await this.$wire.refreshWorkCenters();
+                } finally {
+                    this.refreshing = false;
+                    this.restart();
+                }
+            },
+
+            get warning() {
+                return !this.paused && !this.refreshing && this.remaining <= 10;
+            },
+
+            get label() {
+                if (this.refreshing) return 'A atualizar…';
+                if (this.paused) return 'Atualização em pausa';
+                if (this.warning) return `A atualizar em ${this.remaining} s`;
+                const m = Math.floor(this.remaining / 60);
+                const s = String(this.remaining % 60).padStart(2, '0');
+                return `Próxima atualização em ${m}:${s}`;
+            }
+         }">
+
+        <div class="flex items-center gap-2 h-10 px-3 rounded-lg border text-sm font-medium shadow-sm transition-colors"
+             x-bind:class="warning
+                ? 'bg-amber-400 border-amber-500 text-amber-950 animate-pulse'
+                : (paused
+                    ? 'bg-zinc-200 border-zinc-300 text-zinc-600 dark:bg-zinc-700 dark:border-zinc-600 dark:text-zinc-300'
+                    : 'bg-white border-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200')">
+            <span x-show="!paused && !refreshing"><flux:icon.clock variant="micro" /></span>
+            <span x-show="paused" x-cloak><flux:icon.pause variant="micro" /></span>
+            <span x-show="refreshing" x-cloak><flux:icon.arrow-path variant="micro" class="animate-spin" /></span>
+            <span class="tabular-nums" x-text="label"></span>
+        </div>
+
         @if($filteredData)
         <flux:button variant="primary" color="red" square wire:click="clearFilters">
             <flux:icon.x-mark />
@@ -103,9 +187,11 @@
         <flux:button variant="primary" color="gray" square wire:click="$dispatch('open-wc-filters')">
             <flux:icon.funnel />
         </flux:button>
-        <flux:button variant="primary" color="blue" square wire:click="refreshWorkCenters">
-            <flux:icon.arrow-path />
-        </flux:button>
+        <flux:tooltip content="Atualizar agora" placement="top">
+            <flux:button variant="primary" color="blue" square x-on:click="refreshNow()" x-bind:disabled="refreshing">
+                <flux:icon.arrow-path />
+            </flux:button>
+        </flux:tooltip>
     </div>
 
     <livewire:phc-user-auth />
@@ -121,5 +207,3 @@
         @endif
     @endif
 </div>
-
-

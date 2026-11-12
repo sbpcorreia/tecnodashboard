@@ -83,24 +83,31 @@ class SetInterruptReason extends Component
             ->join("u_tabct", "u_tabct.codct", "=", "u_logtouch.codct")
             ->join("u_tabpr", "u_tabpr.u_tabprstamp", "=", "u_logtouch.tabprstamp")
             ->where("u_logtouchstamp", $this->logTouchStamp)->first();
-        if($record) {
-            $this->workCenterCode = $record->codct;
-            $this->workOrderCode = $record->numof;
-            $this->operationStamp = $record->tabofopstamp;
-            $this->operationCode = $record->numop;
-            $this->operationDescription = $record->descop;
-            $this->workOrderStamp = $record->u_tabofstamp;
-            $this->workCenterStamp = $record->u_tabctstamp;
-            $this->resp = $record->responsavel;
-            $this->bistamp = $record->bistamp;
-            $this->lot = $record->lote;
-            $this->terminal = $record->posto;
-            $this->currentReason = $record->motivo;
-            $this->currentManager = $record->responsavel;
-            $this->reason = $record->codpr;
-            $this->manager = $record->responsavel;
-            $this->peStamp = $record->pestamp;
+
+        // Sem registo, não abre a janela: caso contrário ficariam os dados da
+        // operação aberta anteriormente e o novo motivo seria gravado nessa operação.
+        if(!$record) {
+            Flux::toast("Não foi possível carregar a paragem selecionada. Atualize o painel e tente novamente.", "Erro", 3000, "danger");
+            $this->dispatch('update-work-center');
+            return;
         }
+
+        $this->workCenterCode = $record->codct;
+        $this->workOrderCode = $record->numof;
+        $this->operationStamp = $record->tabofopstamp;
+        $this->operationCode = $record->numop;
+        $this->operationDescription = $record->descop;
+        $this->workOrderStamp = $record->u_tabofstamp;
+        $this->workCenterStamp = $record->u_tabctstamp;
+        $this->resp = $record->responsavel;
+        $this->bistamp = $record->bistamp;
+        $this->lot = $record->lote;
+        $this->terminal = $record->posto;
+        $this->currentReason = $record->motivo;
+        $this->currentManager = $record->responsavel;
+        $this->reason = $record->codpr;
+        $this->manager = $record->responsavel;
+        $this->peStamp = $record->pestamp;
 
         Flux::modal('set-interrupt-reason-modal')->show();
     }
